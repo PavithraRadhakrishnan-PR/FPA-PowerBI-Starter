@@ -1,0 +1,146 @@
+// FP&A Power BI Starter Kit Measures
+// Create a blank Measures table in Power BI Desktop, then paste these measures one at a time.
+
+// -----------------------------------------------------------------------------
+// Base Measures
+// -----------------------------------------------------------------------------
+[Total Amount] = SUM(FactFinancials[Amount])
+
+[Signed P&L Amount] =
+SUMX(
+    FactFinancials,
+    FactFinancials[Amount] * RELATED(DimAccount[Sign])
+)
+
+[Total Personnel Cost] = SUM(FactHeadcount[PersonnelCost])
+
+[Latest Headcount] =
+VAR LatestDateWithHeadcount =
+    MAXX(
+        FILTER(
+            ALLSELECTED(DimDate[Date]),
+            NOT ISBLANK(CALCULATE(SUM(FactHeadcount[Headcount])))
+        ),
+        DimDate[Date]
+    )
+RETURN
+    CALCULATE(
+        SUM(FactHeadcount[Headcount]),
+        DimDate[Date] = LatestDateWithHeadcount
+    )
+
+// -----------------------------------------------------------------------------
+// Revenue Measures
+// -----------------------------------------------------------------------------
+[Actual Revenue] = CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountCategory] = "Revenue")
+[Budget Revenue] = CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountCategory] = "Revenue")
+[Forecast Revenue] = CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountCategory] = "Revenue")
+[Revenue Variance $] = [Actual Revenue] - [Budget Revenue]
+[Revenue Variance %] = DIVIDE([Revenue Variance $], ABS([Budget Revenue]))
+[Revenue Growth YoY $] = [Actual Revenue] - [PY Actual Revenue]
+[Revenue Growth YoY %] = DIVIDE([Revenue Growth YoY $], ABS([PY Actual Revenue]))
+
+// -----------------------------------------------------------------------------
+// P&L Measures
+// -----------------------------------------------------------------------------
+[Actual COGS] = -CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountCategory] = "COGS")
+[Budget COGS] = -CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountCategory] = "COGS")
+[Forecast COGS] = -CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountCategory] = "COGS")
+
+[Gross Profit] = [Actual Revenue] - [Actual COGS]
+[Budget Gross Profit] = [Budget Revenue] - [Budget COGS]
+[Forecast Gross Profit] = [Forecast Revenue] - [Forecast COGS]
+[Gross Margin %] = DIVIDE([Gross Profit], [Actual Revenue])
+[Budget Gross Margin %] = DIVIDE([Budget Gross Profit], [Budget Revenue])
+[Forecast Gross Margin %] = DIVIDE([Forecast Gross Profit], [Forecast Revenue])
+
+[Actual Opex] = -CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountCategory] = "Opex", DimAccount[AccountName] <> "Depreciation & Amortization")
+[Budget Opex] = -CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountCategory] = "Opex", DimAccount[AccountName] <> "Depreciation & Amortization")
+[Forecast Opex] = -CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountCategory] = "Opex", DimAccount[AccountName] <> "Depreciation & Amortization")
+
+[DA] = -CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Depreciation & Amortization")
+[Budget DA] = -CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Depreciation & Amortization")
+[Forecast DA] = -CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Depreciation & Amortization")
+
+[EBITDA] = [Gross Profit] - [Actual Opex]
+[Budget EBITDA] = [Budget Gross Profit] - [Budget Opex]
+[Forecast EBITDA] = [Forecast Gross Profit] - [Forecast Opex]
+[EBITDA Margin %] = DIVIDE([EBITDA], [Actual Revenue])
+[Budget EBITDA Margin %] = DIVIDE([Budget EBITDA], [Budget Revenue])
+[Forecast EBITDA Margin %] = DIVIDE([Forecast EBITDA], [Forecast Revenue])
+
+[EBIT] = [EBITDA] - [DA]
+[Budget EBIT] = [Budget EBITDA] - [Budget DA]
+[Forecast EBIT] = [Forecast EBITDA] - [Forecast DA]
+
+[Interest Expense] = -CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Interest Expense")
+[Budget Interest Expense] = -CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Interest Expense")
+[Forecast Interest Expense] = -CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Interest Expense")
+
+[Net Income] = CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Net Income")
+[Budget Net Income] = CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Net Income")
+[Forecast Net Income] = CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Net Income")
+
+// -----------------------------------------------------------------------------
+// Budget/Forecast Measures for P&L Matrix
+// -----------------------------------------------------------------------------
+[Actual P&L Amount] = CALCULATE([Signed P&L Amount], DimScenario[IsActual] = 1)
+[Budget P&L Amount] = CALCULATE([Signed P&L Amount], DimScenario[IsBudget] = 1)
+[Forecast P&L Amount] = CALCULATE([Signed P&L Amount], DimScenario[IsForecast] = 1)
+[PY Actual P&L Amount] = CALCULATE([Actual P&L Amount], SAMEPERIODLASTYEAR(DimDate[Date]))
+[YoY P&L $] = [Actual P&L Amount] - [PY Actual P&L Amount]
+
+// -----------------------------------------------------------------------------
+// Variance Measures
+// -----------------------------------------------------------------------------
+[Variance $] = [Actual P&L Amount] - [Budget P&L Amount]
+
+[Variance $ (Favorable)] =
+VAR AccountSign = SELECTEDVALUE(DimAccount[Sign], 1)
+RETURN [Variance $] * AccountSign
+
+[Variance % (Favorable)] = DIVIDE([Variance $ (Favorable)], ABS([Budget P&L Amount]))
+[Is Favorable] = IF([Variance $ (Favorable)] >= 0, "Favorable", "Unfavorable")
+[Favorable Color] = IF([Is Favorable] = "Favorable", "#107C10", "#D13438")
+
+// -----------------------------------------------------------------------------
+// Headcount Measures
+// -----------------------------------------------------------------------------
+[Actual Headcount] = CALCULATE([Latest Headcount], DimScenario[IsActual] = 1)
+[Budget Headcount] = CALCULATE([Latest Headcount], DimScenario[IsBudget] = 1)
+[Forecast Headcount] = CALCULATE([Latest Headcount], DimScenario[IsForecast] = 1)
+[Headcount Variance] = [Actual Headcount] - [Budget Headcount]
+[Total Hires] = CALCULATE(SUM(FactHeadcount[Hires]), DimScenario[IsActual] = 1)
+[Total Attritions] = CALCULATE(SUM(FactHeadcount[Attritions]), DimScenario[IsActual] = 1)
+[Net Hires] = [Total Hires] - [Total Attritions]
+[Attrition Rate %] = DIVIDE([Total Attritions], [Actual Headcount])
+[Actual Personnel Cost] = CALCULATE([Total Personnel Cost], DimScenario[IsActual] = 1)
+[Budget Personnel Cost] = CALCULATE([Total Personnel Cost], DimScenario[IsBudget] = 1)
+[Personnel Cost Variance $] = [Actual Personnel Cost] - [Budget Personnel Cost]
+[Cost per Head] = DIVIDE([Actual Personnel Cost], [Actual Headcount])
+
+// -----------------------------------------------------------------------------
+// Cash Flow Measures
+// -----------------------------------------------------------------------------
+[Operating Cash Flow] = CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Operating Cash Flow")
+[Budget Operating Cash Flow] = CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Operating Cash Flow")
+[Forecast Operating Cash Flow] = CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Operating Cash Flow")
+[CapEx] = -CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Capital Expenditures")
+[Budget CapEx] = -CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Capital Expenditures")
+[Forecast CapEx] = -CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Capital Expenditures")
+[Free Cash Flow] = [Operating Cash Flow] - [CapEx]
+[FCF Margin %] = DIVIDE([Free Cash Flow], [Actual Revenue])
+[Cash Balance] = CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Cash Balance")
+[Cash Burn Rate] = MAX(0, -AVERAGEX(VALUES(DimDate[Month]), [Free Cash Flow]))
+[Months of Runway] = DIVIDE([Cash Balance], [Cash Burn Rate])
+
+// -----------------------------------------------------------------------------
+// Time Intelligence
+// -----------------------------------------------------------------------------
+[PY Actual Revenue] = CALCULATE([Actual Revenue], SAMEPERIODLASTYEAR(DimDate[Date]))
+[YTD Actual Revenue] = CALCULATE([Actual Revenue], DATESYTD(DimDate[Date]))
+[YTD Budget Revenue] = CALCULATE([Budget Revenue], DATESYTD(DimDate[Date]))
+[YTD Forecast Revenue] = CALCULATE([Forecast Revenue], DATESYTD(DimDate[Date]))
+[Rolling 3M Revenue] = CALCULATE([Actual Revenue], DATESINPERIOD(DimDate[Date], MAX(DimDate[Date]), -3, MONTH))
+[MoM Revenue $] = [Actual Revenue] - CALCULATE([Actual Revenue], DATEADD(DimDate[Date], -1, MONTH))
+[MoM Revenue %] = DIVIDE([MoM Revenue $], CALCULATE([Actual Revenue], DATEADD(DimDate[Date], -1, MONTH)))

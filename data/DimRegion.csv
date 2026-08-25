@@ -1,0 +1,6 @@
+RegionKey,RegionCode,RegionName,SubRegion,Country
+1,NA,North America,Americas,United States
+2,EMEA,EMEA,Europe,United Kingdom
+3,APAC,APAC,Asia Pacific,Singapore
+4,LATAM,LATAM,Latin America,Brazil
+5,ROW,Rest of World,International,Multiple

@@ -1,0 +1,7 @@
+ProductKey,ProductCode,ProductName,ProductLine,Segment
+1,ENT-CORE,Enterprise Core Platform,Platform,Enterprise
+2,ENT-AI,Enterprise AI Analytics,Analytics,Enterprise
+3,SMB-CORE,SMB Core Suite,Platform,SMB
+4,SMB-AUTO,SMB Automation Pack,Automation,SMB
+5,CON-APP,Consumer Insights App,Applications,Consumer
+6,CON-DATA,Consumer Data Pack,Data Services,Consumer

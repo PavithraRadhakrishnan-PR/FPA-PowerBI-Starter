@@ -1,0 +1,9 @@
+DepartmentKey,DepartmentCode,DepartmentName,CostCenter,Function
+1,CLOUD,Cloud Operations,CC-100,COGS
+2,SUPPORT,Customer Support,CC-110,COGS
+3,ENG,Engineering,CC-200,R&D
+4,PROD,Product Management,CC-210,R&D
+5,SALES,Sales,CC-300,S&M
+6,MKTG,Marketing,CC-310,S&M
+7,FIN,Finance & Accounting,CC-400,G&A
+8,HRIT,People & IT,CC-410,G&A
