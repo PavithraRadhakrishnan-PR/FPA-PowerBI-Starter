@@ -1,0 +1,14 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "RevenueAnalysis",
+  "displayName": "Revenue Analysis",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "annotations": [
+    {
+      "name": "Purpose",
+      "value": "Revenue performance by product, region, segment, month, and rolling 3-month trend."
+    }
+  ]
+}

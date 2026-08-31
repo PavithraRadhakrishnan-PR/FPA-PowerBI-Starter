@@ -1,0 +1,71 @@
+table FactHeadcount
+	lineageTag: 8d70916d-9750-510e-8adf-091bd58fd9cf
+
+	column DateKey
+		dataType: int64
+		lineageTag: c638d84d-7a4d-58c8-8a3a-63f6fd7bc83c
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartmentKey
+		dataType: int64
+		lineageTag: 56355fb6-56b6-51d8-9f10-f001ab9bbd35
+		summarizeBy: none
+		sourceColumn: DepartmentKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScenarioKey
+		dataType: int64
+		lineageTag: 2ecf312c-739e-53c4-a87b-c0a654a0a56c
+		summarizeBy: none
+		sourceColumn: ScenarioKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Headcount
+		dataType: int64
+		lineageTag: d53e9994-3c4c-5f45-ac84-165159f2b66c
+		summarizeBy: sum
+		sourceColumn: Headcount
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hires
+		dataType: int64
+		lineageTag: ee5e33b0-9da9-5be3-b92e-ca2828eeedba
+		summarizeBy: sum
+		sourceColumn: Hires
+
+		annotation SummarizationSetBy = Automatic
+
+	column Attritions
+		dataType: int64
+		lineageTag: 51170c44-7ce0-5ba9-8d9c-046c34d16efe
+		summarizeBy: sum
+		sourceColumn: Attritions
+
+		annotation SummarizationSetBy = Automatic
+
+	column PersonnelCost
+		dataType: double
+		lineageTag: d76572e5-7baf-54ba-9b93-9b74854abc1f
+		summarizeBy: sum
+		sourceColumn: PersonnelCost
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactHeadcount = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/FactHeadcount.csv" else RepoRoot & "/data/FactHeadcount.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"DateKey", Int64.Type}, {"DepartmentKey", Int64.Type}, {"ScenarioKey", Int64.Type}, {"Headcount", Int64.Type}, {"Hires", Int64.Type}, {"Attritions", Int64.Type}, {"PersonnelCost", type number}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table

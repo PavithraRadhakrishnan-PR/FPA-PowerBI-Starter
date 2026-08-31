@@ -1,0 +1,56 @@
+table DimProduct
+	lineageTag: 94238664-00a5-51c7-ae67-534b8496f73a
+
+	column ProductKey
+		dataType: int64
+		isKey
+		lineageTag: ec8a94a1-82c4-5360-a769-62efa1ff974b
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCode
+		dataType: string
+		lineageTag: 20bc7471-fba8-5711-99ab-305f2e4b7beb
+		summarizeBy: none
+		sourceColumn: ProductCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductName
+		dataType: string
+		lineageTag: bb90c1e7-acb9-5160-b73d-a373d43b8fae
+		summarizeBy: none
+		sourceColumn: ProductName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductLine
+		dataType: string
+		lineageTag: 750605c8-bff7-5df6-9d0e-125437ab73ba
+		summarizeBy: none
+		sourceColumn: ProductLine
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 92ade2da-c66b-52ed-8182-ccb559481fed
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimProduct = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/DimProduct.csv" else RepoRoot & "/data/DimProduct.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"ProductKey", Int64.Type}, {"ProductCode", type text}, {"ProductName", type text}, {"ProductLine", type text}, {"Segment", type text}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table

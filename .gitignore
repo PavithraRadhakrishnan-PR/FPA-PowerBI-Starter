@@ -1,0 +1,6 @@
+
+# Power BI Desktop local/cache files
+*.SemanticModel/.pbi/localSettings.json
+*.SemanticModel/.pbi/cache.abf
+*.SemanticModel/.pbi/unappliedChanges.json
+*.Report/.pbi/

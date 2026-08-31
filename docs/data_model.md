@@ -24,7 +24,7 @@ This starter kit uses a classic star schema: two fact tables in the center and c
 
 ## Relationships
 
-Create these relationships in Power BI Desktop Model view.
+These relationships are included in `FPA_PowerBI_Starter.SemanticModel/definition/relationships.tmdl`. If you load the CSVs manually, create them in Power BI Desktop Model view.
 
 | From table | From column | To table | To column | Cardinality | Cross-filter direction | Active |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -56,3 +56,7 @@ Use single-direction filtering from dimensions to facts. Do not create relations
 - `Sign = -1`: lower spend is favorable, such as COGS, opex, D&A, interest, and CapEx.
 
 Use the supplied favorable variance measures so revenue and cost variances are evaluated correctly from an FP&A perspective.
+
+## PBIP Semantic Model
+
+The PBIP project stores the semantic model as TMDL under `FPA_PowerBI_Starter.SemanticModel/definition/`. Set the `RepoRoot` parameter in Power BI Desktop to the absolute path of this repository before refreshing (forward slashes recommended) so each table can import its CSV from `data/`.

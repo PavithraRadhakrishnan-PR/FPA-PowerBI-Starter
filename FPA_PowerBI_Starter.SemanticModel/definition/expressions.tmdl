@@ -1,0 +1,5 @@
+/// Absolute path to the repository clone. Set this once in Power BI Desktop before refreshing CSV imports.
+expression RepoRoot = "" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: e88de6c4-b5d8-58b8-96d4-209ad22222e7
+
+	annotation PBI_ResultType = Text

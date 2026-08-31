@@ -1,0 +1,72 @@
+table DimAccount
+	lineageTag: 9b6fce8c-c710-543c-9b26-30961f365220
+
+	column AccountKey
+		dataType: int64
+		isKey
+		lineageTag: 1ab9ad60-c2a8-5a98-a78a-6f092dc29065
+		summarizeBy: none
+		sourceColumn: AccountKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountCode
+		dataType: string
+		lineageTag: 51e40610-36f2-50a3-81b8-551c9922df2e
+		summarizeBy: none
+		sourceColumn: AccountCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountName
+		dataType: string
+		lineageTag: 3c74a374-62e5-5c44-8de8-dc85565fbd24
+		summarizeBy: none
+		sourceColumn: AccountName
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountCategory
+		dataType: string
+		lineageTag: 00e12a84-d1cf-5cf2-bd35-4d704ea8064f
+		summarizeBy: none
+		sourceColumn: AccountCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column PLOrder
+		dataType: int64
+		lineageTag: eb345d05-9c88-527f-b20f-b7b2b54b05c8
+		summarizeBy: none
+		sourceColumn: PLOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsRevenueDriver
+		dataType: int64
+		lineageTag: b85b9df6-8036-5224-abf1-3e990238f2b1
+		summarizeBy: none
+		sourceColumn: IsRevenueDriver
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sign
+		dataType: int64
+		lineageTag: c21a03e3-fc88-5145-a9d9-18c4511cfaeb
+		summarizeBy: none
+		sourceColumn: Sign
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimAccount = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/DimAccount.csv" else RepoRoot & "/data/DimAccount.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"AccountKey", Int64.Type}, {"AccountCode", type text}, {"AccountName", type text}, {"AccountCategory", type text}, {"PLOrder", Int64.Type}, {"IsRevenueDriver", Int64.Type}, {"Sign", Int64.Type}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,72 @@
+table DimScenario
+	lineageTag: d7ecdeb1-91ca-5c77-8f7c-6e4f388f72c8
+
+	column ScenarioKey
+		dataType: int64
+		isKey
+		lineageTag: 6994b674-ef88-5f0b-b469-8ccd5a561c81
+		summarizeBy: none
+		sourceColumn: ScenarioKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScenarioCode
+		dataType: string
+		lineageTag: 2a6de8f7-f3d1-5776-9689-39b0a5f0f513
+		summarizeBy: none
+		sourceColumn: ScenarioCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScenarioName
+		dataType: string
+		lineageTag: a53cefbc-3e97-549c-b6e6-29f7597d718d
+		summarizeBy: none
+		sourceColumn: ScenarioName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScenarioOrder
+		dataType: int64
+		lineageTag: 3681ea1c-b8e4-5b10-a6b9-c0b6827f52f2
+		summarizeBy: none
+		sourceColumn: ScenarioOrder
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsActual
+		dataType: int64
+		lineageTag: 607006d7-a27f-5d39-8ce5-16db4f917b41
+		summarizeBy: none
+		sourceColumn: IsActual
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsBudget
+		dataType: int64
+		lineageTag: 28d18ef3-2548-5938-99b4-609c9dd8b28f
+		summarizeBy: none
+		sourceColumn: IsBudget
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsForecast
+		dataType: int64
+		lineageTag: 75f66328-b0ff-599d-b3ed-0203784dcefa
+		summarizeBy: none
+		sourceColumn: IsForecast
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimScenario = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/DimScenario.csv" else RepoRoot & "/data/DimScenario.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"ScenarioKey", Int64.Type}, {"ScenarioCode", type text}, {"ScenarioName", type text}, {"ScenarioOrder", Int64.Type}, {"IsActual", Int64.Type}, {"IsBudget", Int64.Type}, {"IsForecast", Int64.Type}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table
