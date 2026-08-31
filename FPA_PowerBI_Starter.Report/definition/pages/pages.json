@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
+  "pageOrder": [
+    "ExecutiveSummary",
+    "PLStatement",
+    "RevenueAnalysis",
+    "OpexAnalysis",
+    "CashFlow",
+    "Workforce"
+  ],
+  "activePageName": "ExecutiveSummary"
+}

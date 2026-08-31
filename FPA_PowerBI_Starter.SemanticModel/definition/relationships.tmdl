@@ -1,0 +1,44 @@
+relationship FactFinancials_DimDate
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactFinancials.DateKey
+	toColumn: DimDate.DateKey
+
+relationship FactFinancials_DimAccount
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactFinancials.AccountKey
+	toColumn: DimAccount.AccountKey
+
+relationship FactFinancials_DimProduct
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactFinancials.ProductKey
+	toColumn: DimProduct.ProductKey
+
+relationship FactFinancials_DimRegion
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactFinancials.RegionKey
+	toColumn: DimRegion.RegionKey
+
+relationship FactFinancials_DimDepartment
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactFinancials.DepartmentKey
+	toColumn: DimDepartment.DepartmentKey
+
+relationship FactFinancials_DimScenario
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactFinancials.ScenarioKey
+	toColumn: DimScenario.ScenarioKey
+
+relationship FactHeadcount_DimDate
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactHeadcount.DateKey
+	toColumn: DimDate.DateKey
+
+relationship FactHeadcount_DimDepartment
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactHeadcount.DepartmentKey
+	toColumn: DimDepartment.DepartmentKey
+
+relationship FactHeadcount_DimScenario
+	crossFilteringBehavior: oneDirection
+	fromColumn: FactHeadcount.ScenarioKey
+	toColumn: DimScenario.ScenarioKey

@@ -1,0 +1,56 @@
+table DimRegion
+	lineageTag: 078aad6b-5aff-5820-b52c-3787741f5400
+
+	column RegionKey
+		dataType: int64
+		isKey
+		lineageTag: 01a49a60-6e43-5c4e-9963-741bc861de7c
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegionCode
+		dataType: string
+		lineageTag: dc47688b-cba8-5d8a-add6-1f108dbeb68d
+		summarizeBy: none
+		sourceColumn: RegionCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegionName
+		dataType: string
+		lineageTag: e6be70e6-7cd0-5c25-ae49-32a50d3fc3b8
+		summarizeBy: none
+		sourceColumn: RegionName
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubRegion
+		dataType: string
+		lineageTag: 77b38b14-f048-58bf-a12d-2dfd6ba466d3
+		summarizeBy: none
+		sourceColumn: SubRegion
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: d9e67362-46f3-5507-aa02-9d23dc1df9a4
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimRegion = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/DimRegion.csv" else RepoRoot & "/data/DimRegion.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"RegionKey", Int64.Type}, {"RegionCode", type text}, {"RegionName", type text}, {"SubRegion", type text}, {"Country", type text}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table

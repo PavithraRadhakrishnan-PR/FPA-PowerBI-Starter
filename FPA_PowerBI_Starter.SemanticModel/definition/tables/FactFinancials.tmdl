@@ -1,0 +1,71 @@
+table FactFinancials
+	lineageTag: 7dd1b4da-499d-58c4-8399-d636a5710474
+
+	column DateKey
+		dataType: int64
+		lineageTag: fa6896d3-03e5-5397-a62f-69c2888149fb
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountKey
+		dataType: int64
+		lineageTag: c6b33f97-2ed0-562d-9eeb-08ffdbab99b2
+		summarizeBy: none
+		sourceColumn: AccountKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: int64
+		lineageTag: bb7c63ae-4e4f-5668-98a8-8196cbd40395
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegionKey
+		dataType: int64
+		lineageTag: f0c9629b-9261-533d-b068-75153208c648
+		summarizeBy: none
+		sourceColumn: RegionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartmentKey
+		dataType: int64
+		lineageTag: 2b525da7-acc6-532d-af3e-5510a7ba5fdc
+		summarizeBy: none
+		sourceColumn: DepartmentKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScenarioKey
+		dataType: int64
+		lineageTag: 1b208dea-2a1f-5864-824b-7fdfe85c2c54
+		summarizeBy: none
+		sourceColumn: ScenarioKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: double
+		lineageTag: 16664743-13e8-57c4-8ae1-6bc561fa77da
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactFinancials = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/FactFinancials.csv" else RepoRoot & "/data/FactFinancials.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"DateKey", Int64.Type}, {"AccountKey", Int64.Type}, {"ProductKey", Int64.Type}, {"RegionKey", Int64.Type}, {"DepartmentKey", Int64.Type}, {"ScenarioKey", Int64.Type}, {"Amount", type number}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table

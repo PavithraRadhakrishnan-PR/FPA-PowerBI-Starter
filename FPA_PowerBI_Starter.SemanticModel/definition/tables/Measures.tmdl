@@ -1,0 +1,439 @@
+table Measures
+	lineageTag: acece6d4-93ba-5b7b-b81d-a4c283257490
+
+	measure 'Total Amount' =
+			SUM(FactFinancials[Amount])
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: a38b7c8f-aa65-58a6-9761-71d9fa275616
+
+	measure 'Signed P&L Amount' =
+			SUMX(
+			    FactFinancials,
+			    FactFinancials[Amount] * RELATED(DimAccount[Sign])
+			)
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 0b9df50a-e388-582d-bbf6-91dbde0e4145
+
+	measure 'Total Personnel Cost' =
+			SUM(FactHeadcount[PersonnelCost])
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 2ce9c366-45f1-56cd-86ce-ab0085ba4ec7
+
+	measure 'Latest Headcount' =
+			VAR LatestDateWithHeadcount =
+			    MAXX(
+			        FILTER(
+			            ALLSELECTED(DimDate[Date]),
+			            NOT ISBLANK(CALCULATE(SUM(FactHeadcount[Headcount])))
+			        ),
+			        DimDate[Date]
+			    )
+			RETURN
+			    CALCULATE(
+			        SUM(FactHeadcount[Headcount]),
+			        DimDate[Date] = LatestDateWithHeadcount
+			    )
+		formatString: #,0
+		lineageTag: 2ac8793b-fcc6-52ad-b237-ce95bd09c8cb
+
+	measure 'Actual Revenue' =
+			CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountCategory] = "Revenue")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 8010a3d7-893e-5fd4-8a16-b0b48ae29162
+
+	measure 'Budget Revenue' =
+			CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountCategory] = "Revenue")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 14bfc1f2-d697-5317-a460-4d2a89226df5
+
+	measure 'Forecast Revenue' =
+			CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountCategory] = "Revenue")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 5a7d45fe-772d-5264-8b0d-f708c8153d73
+
+	measure 'Revenue Variance $' =
+			[Actual Revenue] - [Budget Revenue]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: da50abb7-a300-53f1-bd76-221304aa6ee8
+
+	measure 'Revenue Variance %' =
+			DIVIDE([Revenue Variance $], ABS([Budget Revenue]))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 728a5f97-b057-5d0f-a432-af6299d3210e
+
+	measure 'Revenue Growth YoY $' =
+			[Actual Revenue] - [PY Actual Revenue]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 8e7c88ee-8ce1-5451-ae01-7beebc79f3f9
+
+	measure 'Revenue Growth YoY %' =
+			DIVIDE([Revenue Growth YoY $], ABS([PY Actual Revenue]))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: ed64de87-9bd7-5604-a658-7d2b3814da26
+
+	measure 'Actual COGS' =
+			-CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountCategory] = "COGS")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 85f8eb18-d47d-5fda-8752-810cb4b42c67
+
+	measure 'Budget COGS' =
+			-CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountCategory] = "COGS")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 33f1f0c9-dc18-5de5-8f38-afce166eb0ec
+
+	measure 'Forecast COGS' =
+			-CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountCategory] = "COGS")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: f7b21bf2-7d86-5113-b4cb-eeffed7a02b8
+
+	measure 'Gross Profit' =
+			[Actual Revenue] - [Actual COGS]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: cd1050e5-b730-598c-bf1e-fd563de66560
+
+	measure 'Budget Gross Profit' =
+			[Budget Revenue] - [Budget COGS]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 474be615-d676-5214-b192-9e6d2c5c0075
+
+	measure 'Forecast Gross Profit' =
+			[Forecast Revenue] - [Forecast COGS]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: d45af4f4-2677-52a9-ac3f-82003904b162
+
+	measure 'Gross Margin %' =
+			DIVIDE([Gross Profit], [Actual Revenue])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 76b01a55-93da-5df9-9071-d010dc88d548
+
+	measure 'Budget Gross Margin %' =
+			DIVIDE([Budget Gross Profit], [Budget Revenue])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: cb2b3faf-512a-5fa7-93e6-d531e90ee51f
+
+	measure 'Forecast Gross Margin %' =
+			DIVIDE([Forecast Gross Profit], [Forecast Revenue])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 1dac3652-bf8e-57c3-9acb-69b2a25690c6
+
+	measure 'Actual Opex' =
+			-CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountCategory] = "Opex", DimAccount[AccountName] <> "Depreciation & Amortization")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: b9d6f876-ac3f-50a5-8e86-f906a79a1e05
+
+	measure 'Budget Opex' =
+			-CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountCategory] = "Opex", DimAccount[AccountName] <> "Depreciation & Amortization")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 117ab294-f358-546f-a2bc-47021133f458
+
+	measure 'Forecast Opex' =
+			-CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountCategory] = "Opex", DimAccount[AccountName] <> "Depreciation & Amortization")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 4078cdd8-861d-5939-a35c-794c2d6a623d
+
+	measure DA =
+			-CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Depreciation & Amortization")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 84711b30-bdd6-5e35-81d6-c3ca19bd88f7
+
+	measure 'Budget DA' =
+			-CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Depreciation & Amortization")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: bd58fca4-d5f7-525a-86d4-9923fd7968dd
+
+	measure 'Forecast DA' =
+			-CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Depreciation & Amortization")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 2036379a-8c59-516f-a04c-f9f8ccd84171
+
+	measure EBITDA =
+			[Gross Profit] - [Actual Opex]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 88dda5c0-bc2e-54ad-ac66-fd718b8f9b20
+
+	measure 'Budget EBITDA' =
+			[Budget Gross Profit] - [Budget Opex]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 7f143967-6bbc-509f-9b44-107037ce13c4
+
+	measure 'Forecast EBITDA' =
+			[Forecast Gross Profit] - [Forecast Opex]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 0143bb68-fa8f-511f-aff4-143f379be71b
+
+	measure 'EBITDA Margin %' =
+			DIVIDE([EBITDA], [Actual Revenue])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 4fa6bcb9-df25-5c13-bf42-d6f146b6e94e
+
+	measure 'Budget EBITDA Margin %' =
+			DIVIDE([Budget EBITDA], [Budget Revenue])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 76ba043f-e2b2-582e-913b-178b17a8553a
+
+	measure 'Forecast EBITDA Margin %' =
+			DIVIDE([Forecast EBITDA], [Forecast Revenue])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 9ac26722-912c-55b0-a862-fa075711d626
+
+	measure EBIT =
+			[EBITDA] - [DA]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: fab10a67-d94c-5780-8555-179e683d223c
+
+	measure 'Budget EBIT' =
+			[Budget EBITDA] - [Budget DA]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 7544e90f-6ae9-5170-8cee-35a2eaae8aad
+
+	measure 'Forecast EBIT' =
+			[Forecast EBITDA] - [Forecast DA]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: f05ef6a3-0c49-502f-87cb-04176fe6a6b8
+
+	measure 'Interest Expense' =
+			-CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Interest Expense")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 44936f3b-184f-5db1-b99b-5a449162b568
+
+	measure 'Budget Interest Expense' =
+			-CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Interest Expense")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: d4eabed7-27c4-5cc7-b5fc-e2ef023c520e
+
+	measure 'Forecast Interest Expense' =
+			-CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Interest Expense")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 5b37f48c-d501-51f7-b970-bd6a3e32ae5f
+
+	measure 'Net Income' =
+			CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Net Income")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 5dec78c2-2396-51de-9342-25c7e2e28286
+
+	measure 'Budget Net Income' =
+			CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Net Income")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: d1f72e17-6ea7-5c62-93f8-d4588b86011e
+
+	measure 'Forecast Net Income' =
+			CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Net Income")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 4d67c951-2c92-5ca7-bc01-9443fa7e106d
+
+	measure 'Actual P&L Amount' =
+			CALCULATE([Signed P&L Amount], DimScenario[IsActual] = 1)
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 1a5a614c-3f3d-5b2f-85bb-14ac3af37a36
+
+	measure 'Budget P&L Amount' =
+			CALCULATE([Signed P&L Amount], DimScenario[IsBudget] = 1)
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 2c5f2633-38de-5149-87f0-f8ccfe9b3783
+
+	measure 'Forecast P&L Amount' =
+			CALCULATE([Signed P&L Amount], DimScenario[IsForecast] = 1)
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: ccf2c033-0fbb-514b-9a38-b84f56b54d9d
+
+	measure 'PY Actual P&L Amount' =
+			CALCULATE([Actual P&L Amount], SAMEPERIODLASTYEAR(DimDate[Date]))
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 22011e99-ed71-53e7-bf6d-812a2b165b8e
+
+	measure 'YoY P&L $' =
+			[Actual P&L Amount] - [PY Actual P&L Amount]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 1ceb574c-e9e9-506a-ad41-8be588d4e9de
+
+	measure 'Variance $' =
+			[Actual P&L Amount] - [Budget P&L Amount]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 0ca91404-a475-5c82-bb2c-2f2c7e39a8b5
+
+	measure 'Variance $ (Favorable)' =
+			VAR AccountSign = SELECTEDVALUE(DimAccount[Sign], 1)
+			RETURN [Variance $] * AccountSign
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: acc71491-16b2-5571-952c-7cf721dd8758
+
+	measure 'Variance % (Favorable)' =
+			DIVIDE([Variance $ (Favorable)], ABS([Budget P&L Amount]))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: b99e611a-8a14-57bc-ba07-8a48185e3011
+
+	measure 'Is Favorable' =
+			IF([Variance $ (Favorable)] >= 0, "Favorable", "Unfavorable")
+		lineageTag: 662cb1e4-b133-5c07-afa2-46cb45edf27d
+
+	measure 'Favorable Color' =
+			IF([Is Favorable] = "Favorable", "#107C10", "#D13438")
+		lineageTag: 5eb2074e-e124-50a5-9dd7-20595d354e93
+
+	measure 'Actual Headcount' =
+			CALCULATE([Latest Headcount], DimScenario[IsActual] = 1)
+		formatString: #,0
+		lineageTag: c2e03aa3-78f0-576f-9061-ad9ec1cce77d
+
+	measure 'Budget Headcount' =
+			CALCULATE([Latest Headcount], DimScenario[IsBudget] = 1)
+		formatString: #,0
+		lineageTag: faae767b-e330-50ce-9604-e929431d401d
+
+	measure 'Forecast Headcount' =
+			CALCULATE([Latest Headcount], DimScenario[IsForecast] = 1)
+		formatString: #,0
+		lineageTag: 8a9be09c-b509-53ec-aabb-93c12824267b
+
+	measure 'Headcount Variance' =
+			[Actual Headcount] - [Budget Headcount]
+		formatString: #,0
+		lineageTag: ce01125c-79b8-56ba-a01c-733420c63b90
+
+	measure 'Total Hires' =
+			CALCULATE(SUM(FactHeadcount[Hires]), DimScenario[IsActual] = 1)
+		formatString: #,0
+		lineageTag: c55ee788-b8a3-5d02-a7f9-c15649ba6e3b
+
+	measure 'Total Attritions' =
+			CALCULATE(SUM(FactHeadcount[Attritions]), DimScenario[IsActual] = 1)
+		formatString: #,0
+		lineageTag: bd412499-a7ab-50c6-8312-5bc499c79a52
+
+	measure 'Net Hires' =
+			[Total Hires] - [Total Attritions]
+		formatString: #,0
+		lineageTag: a9a59392-64b2-5a6c-a05c-94efbea1acad
+
+	measure 'Attrition Rate %' =
+			DIVIDE([Total Attritions], [Actual Headcount])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: f0fde8e2-0073-5697-bf6f-d6588e0ba004
+
+	measure 'Actual Personnel Cost' =
+			CALCULATE([Total Personnel Cost], DimScenario[IsActual] = 1)
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: fe18ae8e-ac20-588f-8bbf-aee24582d8ba
+
+	measure 'Budget Personnel Cost' =
+			CALCULATE([Total Personnel Cost], DimScenario[IsBudget] = 1)
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 18915ca0-a273-59b4-967f-384dbe136300
+
+	measure 'Personnel Cost Variance $' =
+			[Actual Personnel Cost] - [Budget Personnel Cost]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: c0d1458e-492b-5501-8998-1409a89f2f4a
+
+	measure 'Cost per Head' =
+			DIVIDE([Actual Personnel Cost], [Actual Headcount])
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 3a88e4ee-1b20-5352-8b08-9d2d7745ed02
+
+	measure 'Operating Cash Flow' =
+			CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Operating Cash Flow")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 85e61acd-5f8a-552b-bb16-d77016ca371e
+
+	measure 'Budget Operating Cash Flow' =
+			CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Operating Cash Flow")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 479e146c-c653-5759-957e-365c1a58f23b
+
+	measure 'Forecast Operating Cash Flow' =
+			CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Operating Cash Flow")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 60d1ad2c-1e48-5b78-8d8d-8a24da0c5ddb
+
+	measure CapEx =
+			-CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Capital Expenditures")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 805f8659-8f13-56e1-a671-531c23182d3e
+
+	measure 'Budget CapEx' =
+			-CALCULATE([Total Amount], DimScenario[IsBudget] = 1, DimAccount[AccountName] = "Capital Expenditures")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 34d0ecf0-9e83-5797-97a1-2fe9e73e06f4
+
+	measure 'Forecast CapEx' =
+			-CALCULATE([Total Amount], DimScenario[IsForecast] = 1, DimAccount[AccountName] = "Capital Expenditures")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 38b9eadd-e921-5186-bec2-9539b53f4830
+
+	measure 'Free Cash Flow' =
+			[Operating Cash Flow] - [CapEx]
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: aca63233-6df7-5312-9fc7-5856f1bbe55a
+
+	measure 'FCF Margin %' =
+			DIVIDE([Free Cash Flow], [Actual Revenue])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 7804536b-cb7f-545a-a442-cfded2af7353
+
+	measure 'Cash Balance' =
+			CALCULATE([Total Amount], DimScenario[IsActual] = 1, DimAccount[AccountName] = "Cash Balance")
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 33f4ee20-a7ed-5eb2-8b64-5a2344ec9f57
+
+	measure 'Cash Burn Rate' =
+			MAX(0, -AVERAGEX(VALUES(DimDate[Month]), [Free Cash Flow]))
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 16b87156-0223-552a-856a-601957c1404a
+
+	measure 'Months of Runway' =
+			DIVIDE([Cash Balance], [Cash Burn Rate])
+		formatString: #,0
+		lineageTag: 8c63ba93-3ac2-5d62-a435-0196e6e922fd
+
+	measure 'PY Actual Revenue' =
+			CALCULATE([Actual Revenue], SAMEPERIODLASTYEAR(DimDate[Date]))
+		lineageTag: a071f6ff-87fb-54fe-8159-842117e5e605
+
+	measure 'YTD Actual Revenue' =
+			CALCULATE([Actual Revenue], DATESYTD(DimDate[Date]))
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: e1edd60e-cb9a-5d4c-9a43-314cad8051a6
+
+	measure 'YTD Budget Revenue' =
+			CALCULATE([Budget Revenue], DATESYTD(DimDate[Date]))
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: b1134430-9c6b-58ee-a2a3-f5e788f049a0
+
+	measure 'YTD Forecast Revenue' =
+			CALCULATE([Forecast Revenue], DATESYTD(DimDate[Date]))
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 13c5cbcd-9e87-5a7f-9a78-219e64e7a430
+
+	measure 'Rolling 3M Revenue' =
+			CALCULATE([Actual Revenue], DATESINPERIOD(DimDate[Date], MAX(DimDate[Date]), -3, MONTH))
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: df80d4f3-f248-5a0c-acd9-aeeba4ce46a0
+
+	measure 'MoM Revenue $' =
+			[Actual Revenue] - CALCULATE([Actual Revenue], DATEADD(DimDate[Date], -1, MONTH))
+		formatString: \$#,0.0;\-$#,0.0;\$#,0.0
+		lineageTag: 8f199185-d7b9-54c1-9260-b230b952373b
+
+	measure 'MoM Revenue %' =
+			DIVIDE([MoM Revenue $], CALCULATE([Actual Revenue], DATEADD(DimDate[Date], -1, MONTH)))
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: f4bc203b-97f9-5969-ae14-6539960cc233
+
+	column Measures
+		dataType: string
+		isHidden
+		lineageTag: 78bd0721-7166-5e42-a3a2-97292889546e
+		summarizeBy: none
+		sourceColumn: Measures
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Measures = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

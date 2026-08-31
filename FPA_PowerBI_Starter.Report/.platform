@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "FP&A Power BI Starter"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ee7d7d4e-4c8c-59e7-b50d-93aecfbfe9a5"
+  }
+}

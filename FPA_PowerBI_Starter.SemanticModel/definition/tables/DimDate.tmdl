@@ -1,0 +1,123 @@
+table DimDate
+	lineageTag: fe941a56-92a7-5eac-8a05-da7a2f7b5388
+
+	column DateKey
+		dataType: int64
+		isKey
+		lineageTag: 59e00871-84e7-5bb1-9b23-f81d598ab3fe
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: f261d7dd-ead9-5ebc-a0aa-b7e61e074b2d
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		lineageTag: 35483b13-832e-5b70-b5de-e68c8100ed36
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: b139d746-2657-578e-9748-a991dde49ed4
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		lineageTag: 0a2d7fdd-f6e5-5627-8166-c36ff2d668e7
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthName
+		dataType: string
+		sortByColumn: Month
+		lineageTag: d995fcca-f066-51b5-bb33-66b996a99576
+		summarizeBy: none
+		sourceColumn: MonthName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthShort
+		dataType: string
+		sortByColumn: Month
+		lineageTag: ec4adfc3-60b8-5cf4-8d42-037c1361f29f
+		summarizeBy: none
+		sourceColumn: MonthShort
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNum
+		dataType: int64
+		lineageTag: 6ecd2cb2-2b9d-5f68-8b18-9d97739309a8
+		summarizeBy: none
+		sourceColumn: WeekNum
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsWeekend
+		dataType: int64
+		lineageTag: 74677515-805a-5553-8b90-55ce4dc8d0a0
+		summarizeBy: none
+		sourceColumn: IsWeekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalYear
+		dataType: int64
+		lineageTag: dc2985a7-3223-5114-9a81-1c8e57ecc961
+		summarizeBy: none
+		sourceColumn: FiscalYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalQuarter
+		dataType: string
+		lineageTag: de13eaa9-71a1-5cc3-a60c-9b519eb0aa84
+		summarizeBy: none
+		sourceColumn: FiscalQuarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column FiscalMonth
+		dataType: int64
+		lineageTag: d046eb52-a780-5a6d-b5db-c1cf87661114
+		summarizeBy: none
+		sourceColumn: FiscalMonth
+
+		annotation SummarizationSetBy = Automatic
+
+	column YTDFlag
+		dataType: int64
+		lineageTag: 89634c72-edbd-50d0-988f-32418e4ba2b8
+		summarizeBy: none
+		sourceColumn: YTDFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/DimDate.csv" else RepoRoot & "/data/DimDate.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=13, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"DateKey", Int64.Type}, {"Date", type date}, {"Year", Int64.Type}, {"Quarter", type text}, {"Month", Int64.Type}, {"MonthName", type text}, {"MonthShort", type text}, {"WeekNum", Int64.Type}, {"IsWeekend", Int64.Type}, {"FiscalYear", Int64.Type}, {"FiscalQuarter", type text}, {"FiscalMonth", Int64.Type}, {"YTDFlag", Int64.Type}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table

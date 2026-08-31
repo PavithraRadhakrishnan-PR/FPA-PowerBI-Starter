@@ -1,0 +1,56 @@
+table DimDepartment
+	lineageTag: a8576838-c79f-5248-9570-1da90b6cbecd
+
+	column DepartmentKey
+		dataType: int64
+		isKey
+		lineageTag: 7d384e10-1bfd-5006-9d98-43af25d3921c
+		summarizeBy: none
+		sourceColumn: DepartmentKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartmentCode
+		dataType: string
+		lineageTag: dfec5bc3-7e72-5120-9061-34fd131a0b77
+		summarizeBy: none
+		sourceColumn: DepartmentCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column DepartmentName
+		dataType: string
+		lineageTag: 4b2cb9ba-dbd2-511c-9fe4-9d832f4d9564
+		summarizeBy: none
+		sourceColumn: DepartmentName
+
+		annotation SummarizationSetBy = Automatic
+
+	column CostCenter
+		dataType: string
+		lineageTag: 725122eb-5178-5175-9b94-85b278e7457c
+		summarizeBy: none
+		sourceColumn: CostCenter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Function
+		dataType: string
+		lineageTag: c554483f-388a-516d-8e2b-de1c5694e878
+		summarizeBy: none
+		sourceColumn: Function
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimDepartment = m
+		mode: import
+		source =
+				let
+				    CsvPath = if Text.EndsWith(RepoRoot, "/") or Text.EndsWith(RepoRoot, "\\") then RepoRoot & "data/DimDepartment.csv" else RepoRoot & "/data/DimDepartment.csv",
+				    Source = Csv.Document(File.Contents(CsvPath), [Delimiter=",", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"DepartmentKey", Int64.Type}, {"DepartmentCode", type text}, {"DepartmentName", type text}, {"CostCenter", type text}, {"Function", type text}})
+				in
+				    ChangedType
+
+	annotation PBI_ResultType = Table

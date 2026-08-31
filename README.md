@@ -4,7 +4,7 @@ A self-contained Power BI starter kit for building a CFO-quality FP&A management
 
 ## 1. Overview
 
-This repository is for finance analysts, FP&A teams, startup finance leaders, and Power BI builders who need a fast starting point for management reporting. The sample data represents a 2024 SaaS/technology company with Actuals from January through September and full-year Budget and Forecast scenarios.
+This repository is for finance analysts, FP&A teams, startup finance leaders, and Power BI builders who need a fast starting point for management reporting. The sample data represents a 2024 SaaS/technology company with monthly Actual, Budget, and Forecast scenarios for all 12 months.
 
 All monetary values are in **USD thousands**. The fiscal year is **January–December 2024**.
 
@@ -13,6 +13,9 @@ All monetary values are in **USD thousands**. The fiscal year is **January–Dec
 ```text
 /
 ├── README.md
+├── FPA_PowerBI_Starter.pbip      # Power BI Desktop project entry point
+├── FPA_PowerBI_Starter.Report/   # PBIR report shell with six FP&A pages and theme binding
+├── FPA_PowerBI_Starter.SemanticModel/ # TMDL semantic model, relationships, measures, CSV imports
 ├── data/
 │   ├── FactFinancials.csv       # Financial actual, budget, and forecast fact data
 │   ├── FactHeadcount.csv        # Headcount, hiring, attrition, and personnel-cost fact data
@@ -23,9 +26,9 @@ All monetary values are in **USD thousands**. The fiscal year is **January–Dec
 │   ├── DimDepartment.csv        # Department/function dimension
 │   └── DimScenario.csv          # Actual, Budget, Forecast scenario dimension
 ├── dax/
-│   └── fpa_measures.dax         # Reusable DAX measures
+│   └── fpa_measures.dax         # Reusable DAX measures mirrored in the semantic model
 ├── theme/
-│   └── fpa_theme.json           # Power BI theme file
+│   └── fpa_theme.json           # Power BI theme file copied into the report resources
 └── docs/
     ├── report_layout.md         # Six-page report build specification
     └── data_model.md            # Star-schema relationships and model notes
@@ -34,18 +37,24 @@ All monetary values are in **USD thousands**. The fiscal year is **January–Dec
 ## 3. Quick Start
 
 1. Open **Power BI Desktop**.
-2. Select **Get Data → Text/CSV** and load every CSV from the `data/` folder.
-3. In **Model view**, create the relationships listed in `docs/data_model.md`.
-4. Apply the theme via **View → Browse for themes** and choose `theme/fpa_theme.json`.
-5. Create a blank table named `Measures` and add the formulas from `dax/fpa_measures.dax`.
-6. Build the six pages using `docs/report_layout.md` as the blueprint.
-7. Format money as `$#,##0K` for detailed visuals or `$#,##0.0M` for executive cards.
+2. Open `FPA_PowerBI_Starter.pbip`.
+3. In **Transform data → Manage parameters**, set `RepoRoot` to the absolute path of this repository clone.
+4. Refresh the semantic model to load the CSV files from `data/`.
+5. Use the six pre-created report pages and the detailed build blueprint in `docs/report_layout.md` to finalize visuals if Power BI Desktop prompts for visual regeneration.
+6. Format money as `$#,##0K` for detailed visuals or `$#,##0.0M` for executive cards.
 
-A finance analyst with basic Power BI knowledge can complete the initial build in about 15 minutes.
+The PBIP project includes a ready semantic model, relationships, measures, theme binding, and six report pages for Power BI Desktop.
 
 ## 4. Step-by-Step Setup
 
-### Load CSVs into Power BI Desktop
+### Open the PBIP Project
+
+1. Open `FPA_PowerBI_Starter.pbip` in Microsoft Power BI Desktop.
+2. Set the `RepoRoot` parameter to the absolute path of this repository clone, for example `C:/Repos/FPA-PowerBI-Starter` (forward slashes recommended).
+3. Refresh the model. The TMDL semantic model imports the CSV files from `data/` and creates the documented relationships.
+4. Save the project. Power BI Desktop will preserve the PBIP folder structure for source control.
+
+### Load CSVs Manually (Fallback)
 
 1. Open Power BI Desktop.
 2. Choose **Home → Get Data → Text/CSV**.
